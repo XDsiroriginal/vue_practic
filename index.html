@@ -1,4 +1,4 @@
-<script defer src="js/vue.min.js"></script>
+<script defer src="js/vue.js"></script>
 <script defer src="js/main.js"></script>
 
 <!doctype html>
@@ -14,20 +14,15 @@
 </head>
 <body>
 <div id="app">
-
     <div class="product">
-
         <div class="product-image">
-            <img :alt="altText" :src="image"/>
+            <img :src="image" :alt="altText"/>
         </div>
-
         <div class="product-info">
             <h1>{{ product }}</h1>
-            <a :href="link">More products like this.</a>
+            <p v-show="inStock">In Stock</p>
+            <span v-show="onSale">On Sale</span>
         </div>
-
-
-
     </div>
 </div>
 </body>
