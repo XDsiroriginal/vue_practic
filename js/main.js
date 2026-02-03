@@ -1,37 +1,81 @@
-let app = new Vue({
-    el: '#app',
-    data: {
-        product: "Socks",
-        brand: 'Vue Mastery',
-        altText: "A pair of socks",
-        details: ['80% cotton', '20% polyester', 'Gender-neutral'],
-        variants: [
-            {
-                variantId: 2234,
-                variantColor: 'green',
-                variantImage: "./assets/vmSocks-green-onWhite.jpg",
-                variantQuantity: 10,
-                onSale: true
-            },
-            {
-                variantId: 2235,
-                variantColor: 'blue',
-                variantImage: "./assets/vmSocks-blue-onWhite.jpg",
-                variantQuantity: 0,
-                onSale: false
-            }
-        ],
+Vue.component('product', {
+    props: {
+        premium: {
+            type: Boolean,
+            required: true
+        }
+    },
+    template: `
+   <div class="product">
+    <div class="product-image">
+           <img :src="image" :alt="altText"/>
+       </div>
 
-        cart: 0,
-        selectedVariant: 0,
+       <div class="product-info">
+           <h1>{{ title }}</h1>
+           <p v-if="inStock">In stock</p>
+           <p v-else>Out of Stock</p>
+           <ul>
+               <li v-for="detail in details">{{ detail }}</li>
+           </ul>
+          <p>Shipping: {{ shipping }}</p>
+           <div
+                   class="color-box"
+                   v-for="(variant, index) in variants"
+                   :key="variant.variantId"
+                   :style="{ backgroundColor:variant.variantColor }"
+                   @mouseover="updateProduct(index)"
+           ></div>    
+
+           <button
+                   v-on:click="addToCart"
+                   :disabled="!inStock"
+                   :class="{ disabledButton: !inStock }"
+           >
+               Add to cart
+           </button>
+           <button
+                   v-on:click="deleteToCart"
+           >
+               Delete to cart
+           </button>
+       
+       </div>
+   </div>
+ `,
+    data() {
+        return {
+            product: "Socks",
+            brand: 'Vue Mastery',
+            selectedVariant: 0,
+            altText: "A pair of socks",
+            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
+            variants: [
+                {
+                    variantId: 2234,
+                    variantColor: 'green',
+                    variantImage: "./assets/vmSocks-green-onWhite.jpg",
+                    variantQuantity: 10
+                },
+                {
+                    variantId: 2235,
+                    variantColor: 'blue',
+                    variantImage: "./assets/vmSocks-blue-onWhite.jpg",
+                    variantQuantity: 0
+                }
+            ],
+        }
     },
     methods: {
         addToCart() {
-            this.cart += 1
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+        },
+        deleteToCart() {
+            this.$emit('delete-to-cart', this.variants[this.selectedVariant].variantId);
         },
         updateProduct(index) {
             this.selectedVariant = index;
-            console.log(this.selectedVariant);
+            console.log(index);
         },
     },
     computed: {
@@ -42,10 +86,35 @@ let app = new Vue({
             return this.variants[this.selectedVariant].variantImage;
         },
         inStock() {
-            return this.variants[this.selectedVariant].variantQuantity;
+            return this.variants[this.selectedVariant].variantQuantity
         },
-        sale() {
-            return (this.variants[this.selectedVariant].onSale ? `${this.brand} ${this.product} On sale` : '');
-        },
-    },
+        shipping() {
+            if (this.premium) {
+                return "Free";
+            } else {
+                return 2.99
+            }
+        }
+    }
 })
+let app = new Vue({
+    el: '#app',
+    data: {
+        premium: true,
+        cart: [],
+    },
+    methods: {
+        updateCart(id) {
+            this.cart.push(id);
+        },
+        deleteCart(id) {
+            if (this.cart.length > 0) {
+                this.cart.splice(this.cart.indexOf(id), 1);
+            }
+            else {
+                alert("No Cart!");
+            }
+        }
+    }
+})
+
