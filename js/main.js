@@ -138,7 +138,7 @@ Vue.component('product-review', {
                 if (!this.rating) this.errors.push("Rating required.")
                 if(!this.recomended) this.errors.push("Recomended required.")
             }
-        }
+        },
     }
 })
 
@@ -233,7 +233,12 @@ Vue.component('product', {
     mounted() {
         eventBus.$on('review-submitted', productReview => {
             this.reviews.push(productReview)
+            localStorage.setItem('reviews', JSON.stringify(this.reviews));
         })
+        savedReviews = localStorage.getItem('reviews');
+        if (savedReviews) {
+            this.reviews = JSON.parse(localStorage.getItem('reviews'));
+        }
     },
 })
 
