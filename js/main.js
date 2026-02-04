@@ -1,5 +1,28 @@
 let eventBus = new Vue()
 
+Vue.component('cart', {
+    template: `
+        <p>Cart({{ cart.length }})</p>
+    `,
+    data() {
+        return {
+            cart: []
+        }
+    },
+    methods: {
+        updateCart(variant) {
+            this.cart.push(variant);
+            console.log(this.cart);
+        }
+    },
+    props: {
+        variant: {
+            type: Array,
+            required: true
+        }
+    }
+})
+
 Vue.component('product-tabs', {
     template: `
      <div>   
@@ -156,7 +179,7 @@ Vue.component('product', {
        </div>
 
        <div class="product-info">
-           <h1>{{ title }}</h1>
+           <h1>{{ title }} </h1>
            <p v-if="inStock">In stock</p>
            <p v-else>Out of Stock</p>
            <div
@@ -190,13 +213,15 @@ Vue.component('product', {
                     variantId: 2234,
                     variantColor: 'green',
                     variantImage: "./assets/vmSocks-green-onWhite.jpg",
-                    variantQuantity: 10
+                    variantQuantity: 10,
+                    variantPrice: 10,
                 },
                 {
                     variantId: 2235,
                     variantColor: 'blue',
                     variantImage: "./assets/vmSocks-blue-onWhite.jpg",
-                    variantQuantity: 0
+                    variantQuantity: 0,
+                    variantPrice: 10,
                 }
             ],
             reviews: []
@@ -204,7 +229,7 @@ Vue.component('product', {
     },
     methods: {
         addToCart() {
-            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+            this.$emit('add-to-cart', this.variants[this.selectedVariant]);
         },
         updateProduct(index) {
             this.selectedVariant = index;
@@ -248,11 +273,5 @@ let app = new Vue({
     el: '#app',
     data: {
         premium: true,
-        cart: []
     },
-    methods: {
-        updateCart(id) {
-            this.cart.push(id);
-        }
-    }
 })
