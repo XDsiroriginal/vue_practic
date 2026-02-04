@@ -27,9 +27,11 @@
                 <p>{{ review.name }}</p>
                 <p>Rating: {{ review.rating }}</p>
                 <p>{{ review.review }}</p>
+                <p>recommended: {{(review.recomended ? 'yes':'no')}}</p>
             </li>
         </ul>
     </div>
+
     <product-review @review-submitted="addReview"></product-review>
 </div>
 
