@@ -25,8 +25,8 @@ Vue.component('product', {
                    :key="variant.variantId"
                    :style="{ backgroundColor:variant.variantColor }"
                    @mouseover="updateProduct(index)"
-           ></div>    
-
+           ></div>
+          
            <button
                    v-on:click="addToCart"
                    :disabled="!inStock"
@@ -34,14 +34,11 @@ Vue.component('product', {
            >
                Add to cart
            </button>
-           <button
-                   v-on:click="deleteToCart"
-           >
-               Delete to cart
-           </button>
        
        </div>
    </div>
+   
+
  `,
     data() {
         return {
@@ -70,9 +67,6 @@ Vue.component('product', {
         addToCart() {
             this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
         },
-        deleteToCart() {
-            this.$emit('delete-to-cart', this.variants[this.selectedVariant].variantId);
-        },
         updateProduct(index) {
             this.selectedVariant = index;
             console.log(index);
@@ -97,24 +91,74 @@ Vue.component('product', {
         }
     }
 })
+
+Vue.component('product-review', {
+    template: `
+   <form class="review-form" @submit.prevent="onSubmit">
+ <p>
+   <label for="name">Name:</label>
+   <input id="name" v-model="name" placeholder="name">
+ </p>
+
+ <p>
+   <label for="review">Review:</label>
+   <textarea id="review" v-model="review"></textarea>
+ </p>
+
+ <p>
+   <label for="rating">Rating:</label>
+   <select id="rating" v-model.number="rating">
+     <option>5</option>
+     <option>4</option>
+     <option>3</option>
+     <option>2</option>
+     <option>1</option>
+   </select>
+ </p>
+
+ <p>
+   <input type="submit" value="Submit"> 
+ </p>
+
+</form>
+
+ `,
+    data() {
+        return {
+            name: null,
+            review: null,
+            rating: null,
+        }
+    },
+    methods: {
+        onSubmit() {
+            let productReview = {
+                name: this.name,
+                review: this.review,
+                rating: this.rating
+            }
+            this.$emit('review-submitted', productReview)
+            this.name = null
+            this.review = null
+            this.rating = null
+        },
+    },
+})
+
+
 let app = new Vue({
     el: '#app',
     data: {
         premium: true,
         cart: [],
+        reviews: [],
     },
     methods: {
         updateCart(id) {
             this.cart.push(id);
         },
-        deleteCart(id) {
-            if (this.cart.length > 0) {
-                this.cart.splice(this.cart.indexOf(id), 1);
-            }
-            else {
-                alert("No Cart!");
-            }
-        }
+        addReview(productReview) {
+            this.reviews.push(productReview)
+        },
     }
 })
-
