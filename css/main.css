@@ -91,3 +91,7 @@ textarea {
 .outOfStock {
     text-decoration: line-through;
 }
+
+.cart {
+    font-size: 30px;
+}

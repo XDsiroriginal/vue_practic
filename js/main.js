@@ -2,22 +2,58 @@ let eventBus = new Vue()
 
 Vue.component('cart', {
     template: `
-        <p>Cart({{ cart.length }})</p>
+        <div>
+            <div @click="showCart = !showCart;">cart</div>
+            <div v-show="showCart">
+                <ul v-if="cart.length">
+                    <li>
+                        <p>{{cart.length}}</p>
+                        <ul>
+                            <li>Green: {{green}}</li>
+                            <li>Blue: {{blue}}</li>
+                        </ul>
+                    </li>
+                    <li>full price: {{fullPrice}}</li>
+                    <li>shipping price: {{shippingCart}}</li>
+                </ul>
+                <p v-else>your cart is void</p>
+            </div>
+        </div>    
     `,
     data() {
         return {
-            cart: []
+            cart: [],
+            showCart: false
         }
     },
-    methods: {
-        updateCart(variant) {
-            this.cart.push(variant);
-            console.log(this.cart);
+    computed: {
+        green() {
+            return this.cart.filter(item => item.variantColor === 'green').length;
+        },
+        blue() {
+            return this.cart.filter(item => item.variantColor === 'blue').length;
+        },
+        fullPrice() {
+            let sum = 0
+            for (let item of this.cart) {
+                sum += item.variantPrice
+            }
+            return sum
+        },
+        shippingCart() {
+            if (this.premium) {
+                return "Free";
+            } else {
+                return 2.99 * this.cart.length;
+            }
         }
+    },
+    mounted() {
+        eventBus.$on('add-to-cart', item => {this.cart.push(item)});
     },
     props: {
-        variant: {
-            type: Array,
+        premium: {
+            type: Boolean,
             required: true
         }
     }
@@ -174,9 +210,11 @@ Vue.component('product', {
     },
     template: `
    <div class="product">
-    <div class="product-image">
+   
+        <div class="product-image">
            <img :src="image" :alt="altText"/>
        </div>
+       
 
        <div class="product-info">
            <h1>{{ title }} </h1>
@@ -196,7 +234,8 @@ Vue.component('product', {
                    :class="{ disabledButton: !inStock }"
            >
                Add to cart
-           </button>    
+           </button>
+           <cart class="cart" :premium="premium"></cart>
        </div>   
        <product-tabs :reviews="reviews" :shipping="shipping" :details="details"></product-tabs>           
        </div>
@@ -229,7 +268,7 @@ Vue.component('product', {
     },
     methods: {
         addToCart() {
-            this.$emit('add-to-cart', this.variants[this.selectedVariant]);
+            eventBus.$emit('add-to-cart', this.variants[this.selectedVariant]);
         },
         updateProduct(index) {
             this.selectedVariant = index;
